@@ -7,6 +7,7 @@ use crate::message::ChatMessage;
 type Client = Recipient<ChatMessage>;
 type Room = HashMap<usize, Client>;
 
+#[derive(Default)]
 pub struct WsQuizServer {
     rooms: HashMap<String, Room>,
 }

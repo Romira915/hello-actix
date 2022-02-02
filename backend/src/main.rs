@@ -1,11 +1,18 @@
+extern crate hello_actix;
+
 use std::{
     fs::{self, File},
     path::Path,
 };
 
 use actix_cors::Cors;
-use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, middleware::Logger, post, web, App, Error, HttpRequest, HttpResponse, HttpServer,
+    Responder,
+};
+use actix_web_actors::ws;
 use chrono::{FixedOffset, Utc};
+use hello_actix::session::WsSession;
 use log::LevelFilter;
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode, WriteLogger,
@@ -23,6 +30,10 @@ async fn echo(req_body: String) -> impl Responder {
 
 async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
+}
+
+async fn chat_route(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+    ws::start(WsSession::default(), &req, stream)
 }
 
 fn init_logger<P>(log_path: Option<P>)
