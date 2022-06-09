@@ -6,6 +6,7 @@ use std::{
 };
 
 use actix_cors::Cors;
+use actix_files::Files;
 use actix_web::{
     get, middleware::Logger, post, web, App, Error, HttpRequest, HttpResponse, HttpServer,
     Responder,
@@ -13,26 +14,12 @@ use actix_web::{
 use actix_web_actors::ws;
 use chrono::{FixedOffset, Utc};
 use hello_actix::session::WsSession;
-use log::LevelFilter;
+use log::{info, LevelFilter};
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode, WriteLogger,
 };
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello actix from Azure Web Apps!")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
-
-async fn chat_route(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+async fn ws_route(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     ws::start(WsSession::default(), &req, stream)
 }
 
@@ -47,7 +34,7 @@ where
     let mut logger: Vec<Box<dyn SharedLogger>> = vec![
         #[cfg(not(feature = "termcolor"))]
         TermLogger::new(
-            LevelFilter::Info,
+            LevelFilter::Debug,
             ConfigBuilder::new().set_time_to_local(true).build(),
             TerminalMode::Mixed,
             ColorChoice::Auto,
@@ -68,18 +55,19 @@ where
 async fn main() -> std::io::Result<()> {
     init_logger(Some(&Path::new("./log")));
 
+    info!("Starting http server");
+
     HttpServer::new(|| {
         App::new()
-            .wrap(
-                Cors::default()
-                    .allowed_origin("All")
-                    .send_wildcard()
-                    .max_age(3600),
-            )
+            // .wrap(
+            //     Cors::default()
+            //         .allowed_origin("All")
+            //         .send_wildcard()
+            //         .max_age(3600),
+            // )
             .wrap(Logger::default())
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .service(web::resource("/ws/").to(ws_route))
+            .service(Files::new("/", "./static/").index_file("index.html"))
     })
     .bind(("0.0.0.0", 3000))?
     .run()

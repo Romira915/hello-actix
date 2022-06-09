@@ -13,7 +13,7 @@ services:
       - ./backend:/app
       - cargo-cache:/usr/local/cargo/registry
       - target-cache:/app/target
-    command: /bin/sh -c "cargo watch -x run"
+    command: /bin/sh -c "cargo watch -i 'log/' -x run"
 
 volumes:
   cargo-cache:
