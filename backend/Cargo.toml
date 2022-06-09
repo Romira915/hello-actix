@@ -1,6 +1,10 @@
 [package]
 edition = "2021"
+<<<<<<< HEAD
 name = "hello-actix"
+=======
+name = "rustknock-backend"
+>>>>>>> origin/main
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,8 +17,21 @@ actix-daemon-utils = "0.4.2"
 actix-files = "0.5.0"
 actix-web = "3.3.3"
 actix-web-actors = "3.0.0"
+<<<<<<< HEAD
+=======
+
+build_timestamp = "0.1.0"
+serde = "1.0.136"
+serde_json = "1.0.78"
+
+>>>>>>> origin/main
 chrono = "0.4.19"
 log = "0.4.14"
 rand = "0.8.4"
 simplelog = "0.11.2"
 tokio = {version = "1.16.1", features = ["time"]}
+<<<<<<< HEAD
+=======
+
+quiz_json = {path = "../quiz_json"}
+>>>>>>> origin/main
